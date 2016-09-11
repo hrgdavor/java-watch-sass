@@ -1,4 +1,4 @@
-package org.hrg.sasswatch;
+package org.hrg.watchsass;
 
 
 import java.io.File;

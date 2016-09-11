@@ -1,4 +1,4 @@
-package org.hrg.sasswatch;
+package org.hrg.watchsass;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -9,6 +9,11 @@ import wrm.libsass.SassCompiler.OutputStyle;
 public class Main {
 	
 	public static void main(String[] args) throws IOException {
+		
+		if(args.length == 0){
+			printHelp();
+			return;
+		}
 		
 		CompilerOptions opts = new CompilerOptions();		
 		opts.appRoot = Paths.get("./");
