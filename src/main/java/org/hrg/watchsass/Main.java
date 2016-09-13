@@ -19,72 +19,69 @@ public class Main {
 		opts.appRoot = Paths.get("./");
 		
 		boolean watch = false;
-		boolean isOption;
+		String arg = null;
+		String arg2 = null;
 		
 		for(int i=0; i<args.length; i++){
+			arg = args[i];
+			arg2 = args.length > i+1 ? args[i+1]:"";//to avoid ArrayIndexOutOfBounds
+
+			// values
+			if("-o".equals(arg) || "--output".equals(arg)){
+				opts.pathStrOutput = arg2;i++;
 			
-			isOption = true;
-
-			// option with value
-			if(args.length > i+1){
-
-				if("-o".equals(args[i]) || "--output".equals(args[i])){
-					opts.pathStrOutput = args[++i];
-				}else if("--output-style".equals(args[i])){
-					String styleStr = args[++i];
-					try {
-						opts.outputStyle = OutputStyle.valueOf(styleStr);						
-					} catch (Exception e) {
-						System.out.println("Unsupported output style: "+styleStr); System.exit(1);
-					}
-				}else if("-o".equals(args[i]) || "--output".equals(args[i])){
-					opts.pathStrOutput = args[++i];
-				}else if("--include-path".equals(args[i])){
-					opts.pathStrInclude.add(args[++i]);
-				}else if("--precision".equals(args[i])){
-					opts.precision = Integer.parseInt(args[++i]);
-				}else{
-					isOption = false;
+			}else if("--output-style".equals(arg)){
+				String styleStr = arg2;i++;
+				try {
+					opts.outputStyle = OutputStyle.valueOf(styleStr);						
+				} catch (Exception e) {
+					System.out.println("Unsupported output style: "+styleStr); System.exit(1);
 				}
+			
+			}else if("--include-path".equals(arg)){
+				opts.pathStrInclude.add(arg2);i++;
+			
+			}else if("--precision".equals(arg)){
+				opts.precision = Integer.parseInt(args[++i]);
 
+			// switches
+			}else if("-v".equals(arg) || "--version".equals(arg)){
+				System.out.println("Java sass-watch version with libsass_3.2.4");
+				System.exit(i);
+			
+			}else if("-w".equals(arg) || "--watch".equals(arg)){
+				watch = true;
+			
+			}else if("-h".equals(arg) || "--help".equals(arg)){
+				printHelp();
+				System.exit(0);
+			
+			}else if("-r".equals(arg) || "--recursive".equals(arg)){
+				opts.recursive = true;
+			
+			}else if("-x".equals(arg) || "--omit-source-map-url".equals(arg)){
+				opts.omitSourceMapingURL = true;
+			
+			}else if("-i".equals(arg) || "--indented-syntax".equals(arg)){
+				opts.inputSyntax = InputSyntax.sass;
+			
+			} if("--source-comments".equals(arg)){
+				opts.generateSourceComments = true;
+			
+			}else if("--source-map".equals(arg)){
+				opts.generateSourceMap = true;
+			
+			}else if("--source-map-contents".equals(arg)){
+				opts.embedSourceContentsInSourceMap = true;
+			
+			}else if("--source-map-embed".equals(arg)){
+				opts.embedSourceMapInCSS = true;
+			
 			}else{
-				isOption = false;
+				// if it is not an option, then it is input
+				opts.pathStrInput = arg;
 			}
 			
-			// check if it is a switch
-			if(!isOption){
-				isOption = true;
-
-				// switches
-				if("-v".equals(args[i]) || "--version".equals(args[i])){
-					System.out.println("Java sass-watch version with libsass_3.2.4");
-					System.exit(i);
-				}else if("-w".equals(args[i]) || "--watch".equals(args[i])){
-					watch = true;
-				}else if("-h".equals(args[i]) || "--help".equals(args[i])){
-					printHelp();
-					System.exit(0);
-				}else if("-r".equals(args[i]) || "--recursive".equals(args[i])){
-					opts.recursive = true;
-				}else if("-x".equals(args[i]) || "--omit-source-map-url".equals(args[i])){
-					opts.omitSourceMapingURL = true;
-				}else if("-i".equals(args[i]) || "--indented-syntax".equals(args[i])){
-					opts.inputSyntax = InputSyntax.sass;
-				} if("--source-comments".equals(args[i])){
-					opts.generateSourceComments = true;
-				}else if("--source-map".equals(args[i])){
-					opts.generateSourceMap = true;
-				}else if("--source-map-contents".equals(args[i])){
-					opts.embedSourceContentsInSourceMap = true;
-				}else if("--source-map-embed".equals(args[i])){
-					opts.embedSourceMapInCSS = true;
-				}else{
-					isOption = false;
-				}
-			}
-			
-			if(!isOption) opts.pathStrInput = args[i];
-
 		}
 		
 		Compiler compiler = new Compiler(opts);
