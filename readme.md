@@ -15,7 +15,9 @@ If you need a command-line tool to build scss
 You can check the code here to get insight on how to build scss from Java program directly.
 
 
-## Comamnd line options:
+## Comamnd line:
+
+Download the single runnable jar with all the dependencies from the  [releases](releases).
 
 ```bash
 usage:
