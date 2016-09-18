@@ -18,6 +18,10 @@ You can check the code here to get insight on how to build scss from Java progra
 ## Comamnd line options:
 
 ```bash
+usage:
+
+java -jar java-watch-sass-0.1.5-libsass_3.2.4.jar [options]
+
     -w, --watch                Watch a directory or file
     -r, --recursive            Recursively watch directories or files
     -o, --output               Output directory

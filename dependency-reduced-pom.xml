@@ -4,7 +4,7 @@
   <groupId>org.hrg</groupId>
   <artifactId>java-watch-sass</artifactId>
   <name>Java sass command line</name>
-  <version>0.1.5-libsass_3.2.4-SNAPSHOT</version>
+  <version>0.1.5-libsass_3.2.4</version>
   <description>Java sass command line tool (and libsass usage example) using libsass-maven-plugin. 
 		https://github.com/warmuuh/libsass-maven-plugin</description>
   <build>
