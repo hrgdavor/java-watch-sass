@@ -3,12 +3,12 @@ Command line utility for compiling scss files using Java with libsass binding (L
 
 Intended to work as replacement for command-line interface of [node-sass](https://github.com/sass/node-sass#command-line-interface) (a nodejs module i used for sometime now). 
 
-This was also built for me to learn how to use
+Reason I made this is to learn how to use
 [libsass-maven](https://github.com/warmuuh/libsass-maven-plugin) programatically, so I can
 integrate scss compilation into some of my own Java based build scripts without requiring user to 
 download nodejs or Ruby.
 
-If you need a command-line tool to build scss
+If you need a command-line tool to build and watch scss
  - if you like/have Java - you can use this tool
  - if you like/have Ruby - it is the home of the original `sass` tool ([instructions](http://sass-lang.com/install))
  - if you like/have nodejs - [node-sass](https://github.com/sass/node-sass#command-line-interface) 
