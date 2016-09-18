@@ -7,10 +7,10 @@ integrate scss compilation into my own Java based build process without requirin
 download nodejs or Ruby.
 
 If you need a command-line tool to build scss
- - you like/have java already - you can use this tool
- - you like/have Ruby - it is the home of the original `sass` tool ([instructions](http://sass-lang.com/install))
- - you like/have nodejs - [node-sass](https://github.com/sass/node-sass#command-line-interface) 
- - try to find compiled binary of: [sassc](https://github.com/sass/sassc)
+ - if you like/have Java - you can use this tool
+ - if you like/have Ruby - it is the home of the original `sass` tool ([instructions](http://sass-lang.com/install))
+ - if you like/have nodejs - [node-sass](https://github.com/sass/node-sass#command-line-interface) 
+ - or try to find compiled binary of: [sassc](https://github.com/sass/sassc)
 
 You can check the code here to get insight on how to build scss from Java program directly.
 
@@ -22,7 +22,7 @@ Download the single runnable jar with all the dependencies from the  [releases](
 ```bash
 usage:
 
-java -jar java-watch-sass-0.1.5-libsass_3.2.4.jar [options]
+java -jar java-watch-sass-{$version}.jar [options]
 
     -w, --watch                Watch a directory or file
     -r, --recursive            Recursively watch directories or files
