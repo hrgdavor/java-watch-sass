@@ -17,7 +17,7 @@ You can check the code here to get insight on how to build scss from Java progra
 
 ## Comamnd line:
 
-Download the single runnable jar with all the dependencies from the  [/hrgdavor/java-watch-sass/releases](releases).
+Download the single runnable jar with all the dependencies from the  [releases](/hrgdavor/java-watch-sass/releases).
 
 ```bash
 usage:
