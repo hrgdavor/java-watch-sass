@@ -12,15 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.hrg.javawatcher.FileChangeEntry;
-import org.hrg.javawatcher.FileMatchGlob;
-import org.hrg.javawatcher.FolderWatcher;
+import hr.hrg.javawatcher.FileChangeEntry;
+import hr.hrg.javawatcher.FileMatchGlob;
+import hr.hrg.javawatcher.FolderWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import wrm.libsass.SassCompilationException;
+import io.bit3.jsass.CompilationException;
 import wrm.libsass.SassCompiler;
-import wrm.libsass.SassCompilerOutput;
 
 public class Compiler {
 
@@ -206,20 +205,21 @@ public class Compiler {
 		sourceMapOutputPath = Paths
 				.get(sourceMapOutputPath.toAbsolutePath().toString().replaceFirst("\\.scss$", ".css.map"));
 
-		SassCompilerOutput out;
+		io.bit3.jsass.Output out;
 		try {
 			out = compiler.compileFile(inputFilePath.toAbsolutePath().toString(),
 					outputFilePath.toAbsolutePath().toString(), sourceMapOutputPath.toAbsolutePath().toString());
-		} catch (SassCompilationException e) {
+		} catch (CompilationException e) {
 			log.error(e.getMessage(),e);
 			return false;
 		}
 
 		if(log.isDebugEnabled()) log.debug("Compilation finished.");
 
-		writeContentToFile(outputFilePath, out.getCssOutput());
-		if (out.getSourceMapOutput() != null) {
-			writeContentToFile(sourceMapOutputPath, out.getSourceMapOutput());
+		writeContentToFile(outputFilePath, out.getCss());
+		String sourceMap = out.getSourceMap();
+		if (sourceMap != null) {
+			writeContentToFile(sourceMapOutputPath, sourceMap);
 		}
 		return true;
 	}

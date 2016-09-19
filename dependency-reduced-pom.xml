@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.hrg</groupId>
+  <groupId>hr.hrg</groupId>
   <artifactId>java-watch-sass</artifactId>
   <name>Java sass command line</name>
-  <version>0.1.5-libsass_3.2.4</version>
+  <version>0.2.4-libsass_3.3.4</version>
   <description>Java sass command line tool (and libsass usage example) using libsass-maven-plugin. 
 		https://github.com/warmuuh/libsass-maven-plugin</description>
   <build>
@@ -13,8 +13,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <optimize>true</optimize>
         </configuration>
       </plugin>
@@ -30,7 +30,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.hrg.watchsass.Main</mainClass>
+                  <mainClass>hr.hrg.watchsass.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>
