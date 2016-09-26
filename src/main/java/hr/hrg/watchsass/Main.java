@@ -1,4 +1,4 @@
-package org.hrg.watchsass;
+package hr.hrg.watchsass;
 
 import java.io.IOException;
 import java.nio.file.Paths;

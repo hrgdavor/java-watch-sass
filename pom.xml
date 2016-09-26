@@ -73,7 +73,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>hr.hrg.watchsass.Main</mainClass>
+									<mainClass>org.hrg.iptunnel.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
