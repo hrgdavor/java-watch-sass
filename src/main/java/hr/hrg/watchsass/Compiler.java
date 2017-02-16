@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import io.bit3.jsass.CompilationException;
 import wrm.libsass.SassCompiler;
 
-public class Compiler {
+public class Compiler implements Runnable{
 
 	static final Logger log = LoggerFactory.getLogger(Compiler.class);
 
@@ -94,9 +94,9 @@ public class Compiler {
 
 		init(watch);
 		
-		if(watch){	
-			watch();
-		}else{
+		if(!watch){	
+			// just compile
+			// caller must make a new thread that will call run, in case watch=true
 			compile();
 		}
 	}
@@ -154,7 +154,7 @@ public class Compiler {
 		}
 	}
 	
-	private void watch() {
+	public void run(){
 		// single thread version that uses FolderWatcher.poll(timeout) to wait for more burst changes
 		// before processing the changed files
 
@@ -175,11 +175,15 @@ public class Compiler {
 					}
 				}
 				
-			}else{
-				
+			}else if(forUpdate.size() >0){
+				// there are some updates and
 				// there are no more new changes, it is ok now to process whatever we gathered so far
 				for (Path p : forUpdate){
-					processFile(p);
+					try {
+						processFile(p);						
+					} catch (Exception e) {
+						log.error("error processing path "+p.toAbsolutePath(),e);
+					}
 				}				
 				forUpdate.clear();
 			}			

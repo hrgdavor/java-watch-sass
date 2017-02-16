@@ -87,6 +87,8 @@ public class Main {
 		Compiler compiler = new Compiler(opts);
 		
 		compiler.start(watch);
+		// run compilation in main thread
+		if(watch) compiler.run();
 	}
 
 	static void printHelp(){
