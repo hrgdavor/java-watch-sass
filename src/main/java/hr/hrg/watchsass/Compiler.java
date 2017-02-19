@@ -54,7 +54,13 @@ public class Compiler implements Runnable{
 			if(opts.recursive) forCompileGlob.includes("**/*.scss");
 		} else {
 			// single SCSS file goes to same folder
-			rootPathOut = rootPathInp = pathInp.getParent();
+			rootPathInp = pathInp.getParent();
+
+			if (opts.pathStrOutput == null)
+				rootPathOut = rootPathInp;
+			else
+				rootPathOut = opts.appRoot.resolve(opts.pathStrOutput);
+
 			forCompileGlob = new MyFileMatcher(rootPathInp, false, true);
 			forCompileGlob.includes(rootPathInp.relativize(pathInp).toString());
 		}
@@ -101,7 +107,7 @@ public class Compiler implements Runnable{
 		}
 	}
 
-	private void init(boolean watch) {
+	public void init(boolean watch) {
 		try {
 			
 			folderWatcher.add(forCompileGlob);
@@ -147,8 +153,7 @@ public class Compiler implements Runnable{
 		}
 	}
 
-
-	protected void compile() {
+	public void compile() {
 		for (Path p : inputFiles) {
 			processFile(p);
 		}
@@ -164,33 +169,26 @@ public class Compiler implements Runnable{
 		Collection<FileChangeEntry<MyFileMatcher>> changed = null;
 		while(!Thread.interrupted()){
 
-			if(changed != null && changed.size() > 0){
-				// there are some files changed, so we process them and prepare for processing
-				for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
-					if(fileChangeEntry.getMatcher().isForCompile())
-						forUpdate.add(fileChangeEntry.getPath());
-					else{
-						log.trace("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
-						forUpdate.addAll(inputFiles);
-					}
-				}
-				
-			}else if(forUpdate.size() >0){
-				// there are some updates and
-				// there are no more new changes, it is ok now to process whatever we gathered so far
-				for (Path p : forUpdate){
-					try {
-						processFile(p);						
-					} catch (Exception e) {
-						log.error("error processing path "+p.toAbsolutePath(),e);
-					}
-				}				
-				forUpdate.clear();
-			}			
+			changed = folderWatcher.takeBatch(opts.updateDelay);
+			if(changed == null) break; // interrupted
 			
-			// if we received some changes, poll again with opts.updateDelay until no new
-			// changes arrive in that short period
-			changed = folderWatcher.poll(changed == null ? 500:opts.updateDelay, TimeUnit.MILLISECONDS);
+			for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
+				if(fileChangeEntry.getMatcher().isForCompile())
+					forUpdate.add(fileChangeEntry.getPath());
+				else{
+					log.trace("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
+					forUpdate.addAll(inputFiles);
+				}
+			}
+			
+			for (Path p : forUpdate){
+				try {
+					processFile(p);						
+				} catch (Exception e) {
+					log.error("error processing path "+p.toAbsolutePath(),e);
+				}
+			}				
+			forUpdate.clear();
 		}
 	}
 	
