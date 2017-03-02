@@ -11,6 +11,10 @@
 	</description>
 	<url>http://github.com/hrgdavor/java-watch-sass</url>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
