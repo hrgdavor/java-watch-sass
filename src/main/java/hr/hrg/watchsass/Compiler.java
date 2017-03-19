@@ -190,6 +190,7 @@ public class Compiler implements Runnable{
 			}				
 			forUpdate.clear();
 		}
+		folderWatcher.close();
 	}
 	
 	private MyFileMatcher forCompileGlob;
