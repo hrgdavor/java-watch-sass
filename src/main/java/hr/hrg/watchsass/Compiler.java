@@ -167,30 +167,33 @@ public class Compiler implements Runnable{
 
 		// main watch loop, that checks for files
 		Collection<FileChangeEntry<MyFileMatcher>> changed = null;
-		while(!Thread.interrupted()){
-
-			changed = folderWatcher.takeBatch(opts.updateDelay);
-			if(changed == null) break; // interrupted
-			
-			for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
-				if(fileChangeEntry.getMatcher().isForCompile())
-					forUpdate.add(fileChangeEntry.getPath());
-				else{
-					log.trace("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
-					forUpdate.addAll(inputFiles);
+		try {
+			while(!Thread.interrupted()){
+				
+				changed = folderWatcher.takeBatch(opts.updateDelay);
+				if(changed == null) break; // interrupted
+				
+				for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
+					if(fileChangeEntry.getMatcher().isForCompile())
+						forUpdate.add(fileChangeEntry.getPath());
+					else{
+						log.trace("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
+						forUpdate.addAll(inputFiles);
+					}
 				}
-			}
-			
-			for (Path p : forUpdate){
-				try {
-					processFile(p);						
-				} catch (Exception e) {
-					log.error("error processing path "+p.toAbsolutePath(),e);
-				}
-			}				
-			forUpdate.clear();
+				
+				for (Path p : forUpdate){
+					try {
+						processFile(p);						
+					} catch (Exception e) {
+						log.error("error processing path "+p.toAbsolutePath(),e);
+					}
+				}				
+				forUpdate.clear();
+			}		
+		} finally {
+			folderWatcher.close();
 		}
-		folderWatcher.close();
 	}
 	
 	private MyFileMatcher forCompileGlob;
