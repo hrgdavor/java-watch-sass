@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>com.github.warmuuh</groupId>
 			<artifactId>libsass-maven-plugin</artifactId>
-			<version>0.2.4-libsass_3.3.4</version>
+			<version>0.2.6-libsass_3.4.0</version>
 			<!-- we do not need maven plugin parts here, as only the library binding 
 				will be used -->
 			<exclusions>
