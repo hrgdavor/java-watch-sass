@@ -1,6 +1,6 @@
-Java watch sass [![Maven Central](https://img.shields.io/maven-central/v/hr.hrg/java-watch-sass.svg)](https://mvnrepository.com/artifact/hr.hrg/java-watch-sass)
+# Java watch sass [![Maven Central](https://img.shields.io/maven-central/v/hr.hrg/java-watch-sass.svg)](https://mvnrepository.com/artifact/hr.hrg/java-watch-sass)
 
-#The utility
+## The utility
 Command line utility for compiling scss files using Java with libsass binding (Linux, windows).
 
 Intended to work as replacement for command-line interface of [node-sass](https://github.com/sass/node-sass#command-line-interface) (a nodejs module i used for sometime now). 
