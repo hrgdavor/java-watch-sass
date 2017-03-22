@@ -27,5 +27,5 @@ public class CompilerOptions {
 	public String pathStrOutput = "./";
 	public List<String> pathStrInclude = new ArrayList<>();
 	public boolean recursive;
-	public long updateDelay = 20;
+	public long burstDelay = 50;
 }

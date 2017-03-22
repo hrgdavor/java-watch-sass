@@ -170,7 +170,7 @@ public class Compiler implements Runnable{
 		try {
 			while(!Thread.interrupted()){
 				
-				changed = folderWatcher.takeBatch(opts.updateDelay);
+				changed = folderWatcher.takeBatch(opts.burstDelay);
 				if(changed == null) break; // interrupted
 				
 				for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
