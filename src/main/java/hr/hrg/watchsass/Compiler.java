@@ -118,7 +118,9 @@ public class Compiler implements Runnable{
 					File file = p.toFile();
 					
 					if (file.exists() && file.isDirectory()) {
-						folderWatcher.add(new MyFileMatcher(p, true, false));
+						MyFileMatcher matcher = new MyFileMatcher(p, true, false);
+						folderWatcher.add(matcher);
+						if(opts.pathStrExclude != null) matcher.excludes(opts.pathStrExclude);
 					} else if (log.isWarnEnabled()) {
 						if (!file.exists()) {
 							log.warn("Include folder does not exist: " + p);

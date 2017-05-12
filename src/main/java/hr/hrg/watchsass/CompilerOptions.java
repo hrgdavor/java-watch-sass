@@ -28,4 +28,5 @@ public class CompilerOptions {
 	public List<String> pathStrInclude = new ArrayList<>();
 	public boolean recursive;
 	public long burstDelay = 50;
+	public List<String> pathStrExclude;
 }
