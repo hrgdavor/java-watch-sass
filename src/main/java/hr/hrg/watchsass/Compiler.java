@@ -23,6 +23,7 @@ import wrm.libsass.SassCompiler;
 
 public class Compiler implements Runnable{
 
+	public static int VERBOSE = 0;
 	static final Logger log = LoggerFactory.getLogger(Compiler.class);
 
 	private CompilerOptions opts;
@@ -140,12 +141,12 @@ public class Compiler implements Runnable{
 			inputFiles.addAll(forCompileGlob.getMatched());
 
 			// log what we are doing
-			if (log.isDebugEnabled()) {
-				log.debug("Input  Path= " + rootPathInp);
-				log.debug("Output Path= " + rootPathOut);
-				log.debug("{} files to compile ",forCompileGlob.getMatched().size());
+			if (VERBOSE > 1) {
+				log.info("Input  Path= " + rootPathInp);
+				log.info("Output Path= " + rootPathOut);
+				log.info("{} files to compile ",forCompileGlob.getMatched().size());
 				for (Path path : inputFiles) {
-					log.debug("Will watch and compile: {}",path);
+					log.info("Will watch and compile: {}",path);
 				}
 			}
 			
@@ -157,7 +158,7 @@ public class Compiler implements Runnable{
 
 	public void compile() {
 		for (Path p : inputFiles) {
-			processFile(p);
+			processFile(p, false);
 		}
 	}
 	
@@ -166,31 +167,37 @@ public class Compiler implements Runnable{
 		// before processing the changed files
 
 		HashSet<Path> forUpdate = new HashSet<>();
-
+		boolean initial = true;
 		// main watch loop, that checks for files
 		Collection<FileChangeEntry<MyFileMatcher>> changed = null;
 		try {
 			while(!Thread.interrupted()){
 				
 				changed = folderWatcher.takeBatch(opts.burstDelay);
-				if(changed == null) break; // interrupted
+				if(changed == null) {
+					initial = false;
+					break; // interrupted
+					
+				}
 				
 				for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
 					if(fileChangeEntry.getMatcher().isForCompile())
 						forUpdate.add(fileChangeEntry.getPath());
 					else{
-						log.trace("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
+						if(VERBOSE > 1)
+							log.info("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
 						forUpdate.addAll(inputFiles);
 					}
 				}
 				
 				for (Path p : forUpdate){
 					try {
-						processFile(p);						
+						processFile(p, initial);						
 					} catch (Exception e) {
 						log.error("error processing path "+p.toAbsolutePath(),e);
 					}
 				}				
+				initial = false;
 				forUpdate.clear();
 			}		
 		} finally {
@@ -200,13 +207,23 @@ public class Compiler implements Runnable{
 	
 	private MyFileMatcher forCompileGlob;
 
-	private final boolean processFile(Path inputFilePath) {
-
-		if(log.isDebugEnabled()) log.debug("rebuild: " + inputFilePath);
+	private final boolean processFile(Path inputFilePath, boolean initial) {
 
 		Path relativeInputPath = rootPathInp.relativize(inputFilePath);
-
 		Path outputFilePath = rootPathOut.resolve(relativeInputPath);
+
+		if(initial) {
+			long modIn  = inputFilePath .toFile().lastModified();
+			long modOut = outputFilePath.toFile().lastModified();
+			if(modIn > modOut) {
+				//if(VERBOSE > 1)
+					log.info("skip older: " + inputFilePath);
+				return false;
+			}
+		}
+		log.info("rebuild: " + inputFilePath);
+
+
 		outputFilePath = Paths.get(outputFilePath.toAbsolutePath().toString().replaceFirst("\\.scss$", ".css"));
 
 		Path sourceMapOutputPath = rootPathSourceMap.resolve(relativeInputPath);
@@ -222,7 +239,7 @@ public class Compiler implements Runnable{
 			return false;
 		}
 
-		if(log.isDebugEnabled()) log.debug("Compilation finished.");
+		if(VERBOSE > 1) log.info("Compilation finished.");
 
 		writeContentToFile(outputFilePath, out.getCss());
 		String sourceMap = out.getSourceMap();
@@ -254,8 +271,8 @@ public class Compiler implements Runnable{
 			}
 		}
 
-		if (log.isTraceEnabled())
-			log.trace("Written to: " + outputFilePath);
+		if (VERBOSE > 1)
+			log.info("Written to: " + outputFilePath);
 	}
 
 	class MyFileMatcher extends FileMatchGlob{
