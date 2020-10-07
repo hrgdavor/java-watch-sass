@@ -23,9 +23,6 @@ import wrm.libsass.SassCompiler;
 
 public class Compiler implements Runnable{
 
-	public static int VERBOSE = 0;
-	static final Logger log = LoggerFactory.getLogger(Compiler.class);
-
 	private CompilerOptions opts;
 	private List<Path> inputFiles = new ArrayList<>();
 	private Path rootPathOut;
@@ -122,11 +119,11 @@ public class Compiler implements Runnable{
 						MyFileMatcher matcher = new MyFileMatcher(p, true, false);
 						folderWatcher.add(matcher);
 						if(opts.pathStrExclude != null) matcher.excludes(opts.pathStrExclude);
-					} else if (log.isWarnEnabled()) {
+					} else if (hr.hrg.javawatcher.Main.isWarnEnabled()) {
 						if (!file.exists()) {
-							log.warn("Include folder does not exist: " + p);
+							hr.hrg.javawatcher.Main.logWarn("Include folder does not exist: " + p);
 						} else {
-							log.warn("Include folder is a file: " + p);
+							hr.hrg.javawatcher.Main.logWarn("Include folder is a file: " + p);
 						}
 					}
 				}
@@ -141,18 +138,18 @@ public class Compiler implements Runnable{
 			inputFiles.addAll(forCompileGlob.getMatched());
 
 			// log what we are doing
-			if (VERBOSE > 1) {
-				log.info("Input  Path= " + rootPathInp);
-				log.info("Output Path= " + rootPathOut);
-				log.info("{} files to compile ",forCompileGlob.getMatched().size());
+			if (hr.hrg.javawatcher.Main.isInfoEnabled()) {
+				hr.hrg.javawatcher.Main.logInfo("Input  Path= " + rootPathInp);
+				hr.hrg.javawatcher.Main.logInfo("Output Path= " + rootPathOut);
+				hr.hrg.javawatcher.Main.logInfo(forCompileGlob.getMatched().size()+" files to compile ");
 				for (Path path : inputFiles) {
-					log.info("Will watch and compile: {}",path);
+					hr.hrg.javawatcher.Main.logInfo("Will watch and compile: "+path);
 				}
 			}
 			
 
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			hr.hrg.javawatcher.Main.logError(e.getMessage(),e);
 		}
 	}
 
@@ -184,17 +181,17 @@ public class Compiler implements Runnable{
 					if(fileChangeEntry.getMatcher().isForCompile())
 						forUpdate.add(fileChangeEntry.getPath());
 					else{
-						if(VERBOSE > 1)
-							log.info("Include changed, adding all input SCSS to recompile queue ({})",fileChangeEntry.getPath());
+						if(hr.hrg.javawatcher.Main.isInfoEnabled())
+							hr.hrg.javawatcher.Main.logInfo("Include changed, adding all input SCSS to recompile queue ("+fileChangeEntry.getPath()+")");
 						forUpdate.addAll(inputFiles);
 					}
 				}
 				
 				for (Path p : forUpdate){
 					try {
-						processFile(p, initial);						
+						processFile(p, initial);
 					} catch (Exception e) {
-						log.error("error processing path "+p.toAbsolutePath(),e);
+						hr.hrg.javawatcher.Main.logError("error processing path "+p.toAbsolutePath(),e);
 					}
 				}				
 				initial = false;
@@ -217,11 +214,11 @@ public class Compiler implements Runnable{
 			long modOut = outputFilePath.toFile().lastModified();
 			if(modIn > modOut) {
 				//if(VERBOSE > 1)
-					log.info("skip older: " + inputFilePath);
+				hr.hrg.javawatcher.Main.logInfo("skip older: " + inputFilePath);
 				return false;
 			}
 		}
-		log.info("rebuild: " + inputFilePath);
+		hr.hrg.javawatcher.Main.logInfo("rebuild: " + inputFilePath);
 
 
 		outputFilePath = Paths.get(outputFilePath.toAbsolutePath().toString().replaceFirst("\\.scss$", ".css"));
@@ -235,11 +232,11 @@ public class Compiler implements Runnable{
 			out = compiler.compileFile(inputFilePath.toAbsolutePath().toString(),
 					outputFilePath.toAbsolutePath().toString(), sourceMapOutputPath.toAbsolutePath().toString());
 		} catch (CompilationException e) {
-			log.error(e.getMessage(),e);
+			hr.hrg.javawatcher.Main.logError(e.getMessage(),e);
 			return false;
 		}
 
-		if(VERBOSE > 1) log.info("Compilation finished.");
+		if(hr.hrg.javawatcher.Main.isInfoEnabled()) hr.hrg.javawatcher.Main.logInfo("Compilation finished.");
 
 		writeContentToFile(outputFilePath, out.getCss());
 		String sourceMap = out.getSourceMap();
@@ -271,8 +268,8 @@ public class Compiler implements Runnable{
 			}
 		}
 
-		if (VERBOSE > 1)
-			log.info("Written to: " + outputFilePath);
+		if (hr.hrg.javawatcher.Main.isInfoEnabled())
+			hr.hrg.javawatcher.Main.logInfo("Written to: " + outputFilePath);
 	}
 
 	class MyFileMatcher extends FileMatchGlob{
