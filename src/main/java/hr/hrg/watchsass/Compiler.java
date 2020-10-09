@@ -15,6 +15,10 @@ import java.util.concurrent.TimeUnit;
 import hr.hrg.javawatcher.FileChangeEntry;
 import hr.hrg.javawatcher.FileMatchGlob;
 import hr.hrg.javawatcher.FolderWatcher;
+import hr.hrg.javawatcher.FolderWatcherOld;
+import hr.hrg.javawatcher.IFolderWatcher;
+import hr.hrg.javawatcher.Main;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +37,10 @@ public class Compiler implements Runnable{
 
 	private Path[] pathInc;
 	
-	FolderWatcher<MyFileMatcher> folderWatcher = new FolderWatcher<MyFileMatcher>();	
+	IFolderWatcher<MyContext> folderWatcher = Main.makeWatcher();	
 
 	public Compiler(CompilerOptions opts) {
+		System.out.println(" FolderWatcher NEW ");
 		this.opts = opts;
 
 		pathInp = opts.appRoot.resolve(opts.pathStrInput);
@@ -166,7 +171,7 @@ public class Compiler implements Runnable{
 		HashSet<Path> forUpdate = new HashSet<>();
 		boolean initial = true;
 		// main watch loop, that checks for files
-		Collection<FileChangeEntry<MyFileMatcher>> changed = null;
+		Collection<FileChangeEntry<MyContext>> changed = null;
 		try {
 			while(!Thread.interrupted()){
 				
@@ -177,8 +182,8 @@ public class Compiler implements Runnable{
 					
 				}
 				
-				for (FileChangeEntry<MyFileMatcher> fileChangeEntry : changed) {
-					if(fileChangeEntry.getMatcher().isForCompile())
+				for (FileChangeEntry<MyContext> fileChangeEntry: changed) {
+					if(fileChangeEntry.getMatcher().getContext().isForCompile())
 						forUpdate.add(fileChangeEntry.getPath());
 					else{
 						if(hr.hrg.javawatcher.Main.isInfoEnabled())
@@ -212,11 +217,11 @@ public class Compiler implements Runnable{
 		if(initial) {
 			long modIn  = inputFilePath .toFile().lastModified();
 			long modOut = outputFilePath.toFile().lastModified();
-			if(modIn > modOut) {
-				//if(VERBOSE > 1)
-				hr.hrg.javawatcher.Main.logInfo("skip older: " + inputFilePath);
-				return false;
-			}
+//			if(modIn > modOut) {
+//				//if(VERBOSE > 1)
+//				hr.hrg.javawatcher.Main.logInfo("skip older: " + inputFilePath);
+//				return false;
+//			}
 		}
 		hr.hrg.javawatcher.Main.logInfo("rebuild: " + inputFilePath);
 
@@ -272,21 +277,28 @@ public class Compiler implements Runnable{
 			hr.hrg.javawatcher.Main.logInfo("Written to: " + outputFilePath);
 	}
 
-	class MyFileMatcher extends FileMatchGlob{
+	class MyContext{
 		private boolean forCompile;
-
-		public MyFileMatcher(Path root, boolean recursive, boolean forCompile) {
-			super(root, recursive);
+		public MyContext(boolean forCompile) {
 			this.forCompile = forCompile;
+		}
+		public boolean isForCompile() {
+			return forCompile;
+		}
+	}
+	
+	class MyFileMatcher extends FileMatchGlob<MyContext>{
+		public MyFileMatcher(Path root, boolean recursive, boolean forCompile) {
+			super(root, new MyContext(forCompile), recursive);
 		}
 		
 		public boolean isForCompile() {
-			return forCompile;
+			return getContext().isForCompile();
 		}
 		
 		@Override
 		public String toString() {
-			return (forCompile ? "compile":"include")+":"+rootString;
+			return (isForCompile() ? "compile":"include")+":"+rootString;
 		}
 	}
 }
