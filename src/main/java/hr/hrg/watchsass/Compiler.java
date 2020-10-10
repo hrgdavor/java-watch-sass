@@ -43,7 +43,7 @@ public class Compiler implements Runnable{
 		System.out.println(" FolderWatcher NEW ");
 		this.opts = opts;
 
-		pathInp = opts.appRoot.resolve(opts.pathStrInput);
+		pathInp = opts.appRoot.resolve(opts.pathStrInput).toAbsolutePath().normalize();
 		
 		if (pathInp.toFile().isDirectory()) {
 			rootPathInp = pathInp;
@@ -57,7 +57,7 @@ public class Compiler implements Runnable{
 			if(opts.recursive) forCompileGlob.includes("**/*.scss");
 		} else {
 			// single SCSS file goes to same folder
-			rootPathInp = pathInp.getParent();
+			rootPathInp = pathInp.getParent().toAbsolutePath().normalize();
 
 			if (opts.pathStrOutput == null)
 				rootPathOut = rootPathInp;
@@ -65,6 +65,9 @@ public class Compiler implements Runnable{
 				rootPathOut = opts.appRoot.resolve(opts.pathStrOutput);
 
 			forCompileGlob = new MyFileMatcher(rootPathInp, false, true);
+			System.err.println();
+			System.err.println(rootPathInp);
+			System.err.println(rootPathInp.relativize(pathInp).toString());
 			forCompileGlob.includes(rootPathInp.relativize(pathInp).toString());
 		}
 		// getMatched() does not work without this
@@ -184,7 +187,7 @@ public class Compiler implements Runnable{
 				
 				for (FileChangeEntry<MyContext> fileChangeEntry: changed) {
 					if(fileChangeEntry.getMatcher().getContext().isForCompile())
-						forUpdate.add(fileChangeEntry.getPath());
+						forUpdate.add(forCompileGlob.relativize(fileChangeEntry.getPath()));
 					else{
 						if(hr.hrg.javawatcher.Main.isInfoEnabled())
 							hr.hrg.javawatcher.Main.logInfo("Include changed, adding all input SCSS to recompile queue ("+fileChangeEntry.getPath()+")");
@@ -210,7 +213,7 @@ public class Compiler implements Runnable{
 	private MyFileMatcher forCompileGlob;
 
 	private final boolean processFile(Path inputFilePath, boolean initial) {
-
+		inputFilePath = forCompileGlob.getRootPathAbs().resolve(inputFilePath);
 		Path relativeInputPath = rootPathInp.relativize(inputFilePath);
 		Path outputFilePath = rootPathOut.resolve(relativeInputPath);
 
